@@ -1,7 +1,10 @@
 [package]
 name = "openexr"
-version = "3.0.1"
-authors = ["Anders Langlands <anderslanglands@gmail.com>", "Scott Wilson <scott@propersquid.com>"]
+version = "0.10.0"
+authors = ["Anders Langlands <anderslanglands@gmail.com>",
+           "Luke Titley <from+openexr_rs@luketitley.com>",
+           "Scott Wilson <scott@propersquid.com>",
+           "Tiago Carvalho <tiago.carvalho@loquattech.com>"]
 edition = "2018"
 
 [package.metadata.docs.rs]
@@ -24,14 +27,14 @@ nalgebra-glm = {version = "^0.12", optional = true}
 half = "^1.7"
 thiserror = "^1.0"
 paste = "^1.0"
-bitflags = "1.2.1"
+bitflags = "^1.2"
 embed-doc-image = {version = "0.1.4", optional=true}
-cfg-if = "1.0.0"
+cfg-if = "^1.0"
 
 [dev-dependencies]
-png = "0.16.8"
-itertools = "0.10.0"
-lazy_static = "1.4.0"
+png = "^0.16"
+itertools = "^0.10"
+lazy_static = "^1.4"
 
 [features]
 default = []
