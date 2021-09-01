@@ -1,6 +1,6 @@
 [package]
 name = "openexr"
-version = "0.10.0"
+version = "0.10.1"
 authors = ["Anders Langlands <anderslanglands@gmail.com>",
            "Luke Titley <from+openexr_rs@luketitley.com>",
            "Scott Wilson <scott@propersquid.com>",
@@ -26,7 +26,7 @@ rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-openexr-sys = "^0.10"
+openexr-sys = "^0.10.1"
 imath-traits = "^0.4"
 cgmath = {version = "^0.18", optional = true}
 glam = {version = "^0.17", optional = true}
