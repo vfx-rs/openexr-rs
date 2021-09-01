@@ -7,6 +7,13 @@ authors = ["Anders Langlands <anderslanglands@gmail.com>",
            "Tiago Carvalho <tiago.carvalho@loquattech.com>"]
 edition = "2018"
 
+description = "High-level bindings to OpenEXR 3.0.5"
+documentation = "https://docs.rs/openexr"
+repository = "https://github.com/vfx-rs/openexr-rs"
+readme = "README.md"
+keywords = ["graphics", "image", "vfx", "exr", "openexr"]
+categories = ["api-bindings", "computer-vision", "graphics", "multimedia", "rendering"]
+
 [package.metadata.docs.rs]
 # docs.rs uses a nightly compiler, so by instructing it to use our `doc-images` feature we
 # ensure that it will render any images that we may have in inner attribute documentation.
