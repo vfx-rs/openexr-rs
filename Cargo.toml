@@ -7,6 +7,7 @@ authors = ["Anders Langlands <anderslanglands@gmail.com>",
            "Tiago Carvalho <tiago.carvalho@loquattech.com>"]
 edition = "2018"
 
+license="BSD-3-Clause"
 description = "High-level bindings to OpenEXR 3.0.5"
 documentation = "https://docs.rs/openexr"
 repository = "https://github.com/vfx-rs/openexr-rs"
