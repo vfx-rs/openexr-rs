@@ -95,15 +95,15 @@ contender to this crowded field, we instead provide a set of traits that allow
 any of these crates to be used with openexr in the form of [imath-traits](https://crates.io/crates/imath-traits). By default, these traits are implemented for arrays and slices, so you will find that the examples in this documentation will tend to use e.g. `[i32; 4]` for bounding boxes:
 
 ```rust
-# use openexr::prelude::*;
-# fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
-#   use imath_traits::Zero;
+use openexr::prelude::*;
+fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    use imath_traits::Zero;
     let mut file = RgbaInputFile::new(path, 1).unwrap();
     let data_window = file.header().data_window::<[i32; 4]>().clone();
     let width = data_window.width() + 1;
     let height = data_window.height() + 1;
-#    Ok(())
-# }
+    Ok(())
+}
 ```
 
 To use your preffered math crate instead, simply enable the corresponding feature on openexr,
@@ -118,18 +118,18 @@ the case that the math crate does not provide a bounding box type, one will
 be available as `imath_traits::Box2i` and `imath_traits::Box3i`.
 
 ```rust
-# use openexr::prelude::*;
+use openexr::prelude::*;
 #[cfg(feature = "imath_cgmath")]
-# fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
-#   use imath_traits::Zero;
+fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
+   use imath_traits::Zero;
     use imath_traits::Box2i;
 
     let mut file = RgbaInputFile::new(path, 1).unwrap();
     let data_window: Box2i = *file.header().data_window();
     let width = data_window.width() + 1;
     let height = data_window.height() + 1;
-#    Ok(())
-# }
+    Ok(())
+}
 ```
 
 # Features
