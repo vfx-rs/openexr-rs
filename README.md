@@ -141,36 +141,4 @@ fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
 * Flexible support for deep data: pixels can store a variable-length list of samples and, thus, it is possible to store multiple values at different depths for each pixel. Hard surfaces and volumetric data representations are accommodated.
 * Multipart: ability to encode separate, but related, images in one file. This allows for access to individual parts without the need to read other parts in the file.
 
-# Long-Form Documentation
-
-The following documents give a more in-depth view of different parts of the
-openexr crate:
-
-* [Reading and Writing Image Files](crate::doc::reading_and_writing_image_files) - A
-tutorial-style guide to the main image reading and writing interfaces.
-* [Technical Introduction](crate::doc::technical_introduction) - A technical overview of the
-OpenEXR format and its related concepts.
-* [Interpreting Deep Pixels](crate::doc::interpreting_deep_pixels) - An in-depth look at how
-deep pixels are stored and how to manipulate their samples.
-* [Multi-View OpenEXR](crate::doc::multi_view_open_exr) - Representation of multi-view images
-in OpenEXR files.
-
-# Building the documentation
-
-To build the full documentation including long-form docs and KaTeX equations, use the following
-command:
-
-```bash
-cargo +nightly doc --no-deps --features=long-form-docs
-```
-Note this is done automatically for docs.rs when publishing.
-
-To run the doctests in the long-form docs (i.e. make sure the code examples
-compile correctly) run:
-```bash
-cargo +nightly test --features=long-form-docs
-```
-
-This should no longer be necessary once Rust 1.54 is released.
-
 
