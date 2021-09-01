@@ -1,5 +1,7 @@
 # OpenEXR
 
+## Bound version: 3.0.5
+
 The openexr crate provides high-level bindings for the [ASWF OpenEXR library](https://github.com/AcademySoftwareFoundation/openexr),
 which allows reading and writing files in the OpenEXR format (EXR standing
 for **EX**tended **R**ange). The OpenEXR format is the de-facto standard
@@ -39,7 +41,7 @@ you will encounter linker errors since all OpenEXR symbols are versioned.
 The [`prelude`](crate::prelude) pulls in the set of types that you
 need for basic file I/O of RGBA and arbitrary channel images:
 
-```no_run
+```rust
 use openexr::prelude::*;
 
 fn write_rgba1(filename: &str, pixels: &[Rgba], width: i32, height: i32)
@@ -92,16 +94,16 @@ such as [cgmath](https://crates.io/crates/cgmath), [nalgebra](https://crates.io/
 contender to this crowded field, we instead provide a set of traits that allow
 any of these crates to be used with openexr in the form of [imath-traits](https://crates.io/crates/imath-traits). By default, these traits are implemented for arrays and slices, so you will find that the examples in this documentation will tend to use e.g. `[i32; 4]` for bounding boxes:
 
-```no_run
-# use openexr::prelude::*;
-# fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
-#   use imath_traits::Zero;
+```rust
+use openexr::prelude::*;
+fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    use imath_traits::Zero;
     let mut file = RgbaInputFile::new(path, 1).unwrap();
     let data_window = file.header().data_window::<[i32; 4]>().clone();
     let width = data_window.width() + 1;
     let height = data_window.height() + 1;
-#    Ok(())
-# }
+    Ok(())
+}
 ```
 
 To use your preffered math crate instead, simply enable the corresponding feature on openexr,
@@ -115,19 +117,19 @@ Now you can use types from that crate together with openexr seamlessly. In
 the case that the math crate does not provide a bounding box type, one will
 be available as `imath_traits::Box2i` and `imath_traits::Box3i`.
 
-```no_run
-# use openexr::prelude::*;
+```rust
+use openexr::prelude::*;
 #[cfg(feature = "imath_cgmath")]
-# fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
-#   use imath_traits::Zero;
+fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
+   use imath_traits::Zero;
     use imath_traits::Box2i;
 
     let mut file = RgbaInputFile::new(path, 1).unwrap();
     let data_window: Box2i = *file.header().data_window();
     let width = data_window.width() + 1;
     let height = data_window.height() + 1;
-#    Ok(())
-# }
+    Ok(())
+}
 ```
 
 # Features
@@ -138,37 +140,5 @@ be available as `imath_traits::Box2i` and `imath_traits::Box3i`.
 * Support for stereoscopic image workflows and a generalization to multi-views.
 * Flexible support for deep data: pixels can store a variable-length list of samples and, thus, it is possible to store multiple values at different depths for each pixel. Hard surfaces and volumetric data representations are accommodated.
 * Multipart: ability to encode separate, but related, images in one file. This allows for access to individual parts without the need to read other parts in the file.
-
-# Long-Form Documentation
-
-The following documents give a more in-depth view of different parts of the
-openexr crate:
-
-* [Reading and Writing Image Files](crate::doc::reading_and_writing_image_files) - A
-tutorial-style guide to the main image reading and writing interfaces.
-* [Technical Introduction](crate::doc::technical_introduction) - A technical overview of the
-OpenEXR format and its related concepts.
-* [Interpreting Deep Pixels](crate::doc::interpreting_deep_pixels) - An in-depth look at how
-deep pixels are stored and how to manipulate their samples.
-* [Multi-View OpenEXR](crate::doc::multi_view_open_exr) - Representation of multi-view images
-in OpenEXR files.
-
-# Building the documentation
-
-To build the full documentation including long-form docs and KaTeX equations, use the following
-command:
-
-```bash
-cargo +nightly doc --no-deps --features=long-form-docs
-```
-Note this is done automatically for docs.rs when publishing.
-
-To run the doctests in the long-form docs (i.e. make sure the code examples
-compile correctly) run:
-```bash
-cargo +nightly test --features=long-form-docs
-```
-
-This should no longer be necessary once Rust 1.54 is released.
 
 
