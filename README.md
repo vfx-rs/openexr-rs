@@ -39,7 +39,7 @@ you will encounter linker errors since all OpenEXR symbols are versioned.
 The [`prelude`](crate::prelude) pulls in the set of types that you
 need for basic file I/O of RGBA and arbitrary channel images:
 
-```no_run
+```rust
 use openexr::prelude::*;
 
 fn write_rgba1(filename: &str, pixels: &[Rgba], width: i32, height: i32)
@@ -92,7 +92,7 @@ such as [cgmath](https://crates.io/crates/cgmath), [nalgebra](https://crates.io/
 contender to this crowded field, we instead provide a set of traits that allow
 any of these crates to be used with openexr in the form of [imath-traits](https://crates.io/crates/imath-traits). By default, these traits are implemented for arrays and slices, so you will find that the examples in this documentation will tend to use e.g. `[i32; 4]` for bounding boxes:
 
-```no_run
+```rust
 # use openexr::prelude::*;
 # fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
 #   use imath_traits::Zero;
@@ -115,7 +115,7 @@ Now you can use types from that crate together with openexr seamlessly. In
 the case that the math crate does not provide a bounding box type, one will
 be available as `imath_traits::Box2i` and `imath_traits::Box3i`.
 
-```no_run
+```rust
 # use openexr::prelude::*;
 #[cfg(feature = "imath_cgmath")]
 # fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
