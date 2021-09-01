@@ -1,6 +1,6 @@
 # OpenEXR
 
-# Bound version: 3.0.5
+## Bound version: 3.0.5
 
 The openexr crate provides high-level bindings for the [ASWF OpenEXR library](https://github.com/AcademySoftwareFoundation/openexr),
 which allows reading and writing files in the OpenEXR format (EXR standing
