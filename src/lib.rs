@@ -1,5 +1,8 @@
 //! # OpenEXR
 //!
+//! **BOUND VERSION: 3.0.5**
+//!
+//! Introduction
 //! The openexr crate provides high-level bindings for the [ASWF OpenEXR library](https://github.com/AcademySoftwareFoundation/openexr),
 //! which allows reading and writing files in the OpenEXR format (EXR standing
 //! for **EX**tended **R**ange). The OpenEXR format is the de-facto standard
@@ -23,7 +26,7 @@
 //! cargo build
 //! ```
 //!
-//! While this method is supported and easiest to get starter, it is strongly 
+//! While this method is supported and easiest to get starter, it is strongly
 //! recommended that you build and install the C++ library separately and build
 //! the crate against it like so:
 //!
@@ -53,7 +56,9 @@
 //!     )?;
 //!
 //!     file.set_frame_buffer(&pixels, 1, width as usize)?;
-//!     file.write_pixels(height)?;
+//!     unsafe {
+//!         file.write_pixels(height)?;
+//!     }
 //!
 //!     Ok(())
 //! }
@@ -70,7 +75,9 @@
 //!
 //!     let mut pixels = vec![Rgba::zero(); (width * height) as usize];
 //!     file.set_frame_buffer(&mut pixels, 1, width as usize)?;
-//!     file.read_pixels(0, height - 1)?;
+//!     unsafe {
+//!         file.read_pixels(0, height - 1)?;
+//!     }
 //!
 //!     Ok(())
 //! }
@@ -126,6 +133,40 @@
 //!     let data_window: Box2i = *file.header().data_window();
 //!     let width = data_window.width() + 1;
 //!     let height = data_window.height() + 1;
+//! #    Ok(())
+//! # }
+//! ```
+//!
+//! # Safety
+//! Some parts of the OpenEXR API are not easily representable in safe Rust.
+//! Notably, the interaction between [`Slice`](crate::core::frame_buffer::Slice), [`FrameBuffer`](crate::core::frame_buffer::FrameBuffer) and the various
+//! File types essentially creates a chain of (mutable) references between the
+//! memory backing the pixel data and the file.
+//!
+//! Representing this with lifetimes such that the Rust compiler could track it
+//! would make working with these types extremely unwieldy, so instead the
+//! methods which actually use the pointers in slices and framebuffers are
+//! marked unsafe. It is the caller's responsibility to make sure that the
+//! pointers inserted into the framebuffer are still valid when the image is
+//! read or written:
+//!
+//! ```
+//! # use openexr::prelude::*;
+//! # fn write_rgba1(filename: &str, pixels: &[Rgba], width: i32, height: i32)
+//! # -> Result<(), Box<dyn std::error::Error>> {
+//! #     let header = Header::from_dimensions(width, height);
+//! #     let mut file = RgbaOutputFile::new(
+//! #         filename,
+//! #         &header,
+//! #         RgbaChannels::WriteRgba,
+//! #         1,
+//! #     )?;
+//! // set_frame_buffer internally stores a slice in a frame buffer on the file
+//! // struct. pixels must live until the write_pixels call below has completed.
+//! file.set_frame_buffer(&pixels, 1, width as usize)?;
+//! unsafe {
+//!     file.write_pixels(height)?;
+//! }
 //! #    Ok(())
 //! # }
 //! ```
@@ -263,7 +304,9 @@ mod tests {
         let mut file =
             RgbaOutputFile::new(filename, &header, RgbaChannels::WriteRgba, 4)?;
         file.set_frame_buffer(&pixels, 1, width as usize)?;
-        file.write_pixels(height)?;
+        unsafe {
+            file.write_pixels(height)?;
+        }
 
         Ok(())
     }
@@ -282,7 +325,9 @@ mod tests {
         )?;
 
         file.set_frame_buffer(&pixels, 1, width as usize)?;
-        file.write_pixels(height)?;
+        unsafe {
+            file.write_pixels(height)?;
+        }
 
         Ok(())
     }
@@ -306,7 +351,9 @@ mod tests {
         )?;
 
         file.set_frame_buffer(&pixels, 1, width as usize)?;
-        file.write_pixels(height)?;
+        unsafe {
+            file.write_pixels(height)?;
+        }
 
         Ok(())
     }
@@ -329,7 +376,9 @@ mod tests {
 
         let mut pixels = vec![Rgba::zero(); (width * height) as usize];
         file.set_frame_buffer(&mut pixels, 1, width as usize)?;
-        file.read_pixels(0, height - 1)?;
+        unsafe {
+            file.read_pixels(0, height - 1)?;
+        }
 
         let mut ofile = RgbaOutputFile::with_dimensions(
             "read_rgba1.exr",
@@ -345,7 +394,9 @@ mod tests {
         )?;
 
         ofile.set_frame_buffer(&pixels, 1, width as usize)?;
-        ofile.write_pixels(height)?;
+        unsafe {
+            ofile.write_pixels(height)?;
+        }
 
         Ok(())
     }

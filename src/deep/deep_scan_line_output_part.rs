@@ -138,7 +138,9 @@ impl<'a> DeepScanLineOutputPart<'a> {
     /// This method is wildly unsafe as on the C++ side it's reading from
     /// pointers offset from the base pointers supplied by the
     /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
-    /// the [`DeepFrameBuffer`].
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
     ///
     pub unsafe fn write_pixels(&mut self, num_scan_lines: i32) -> Result<()> {
         sys::Imf_DeepScanLineOutputPart_writePixels(

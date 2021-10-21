@@ -38,15 +38,17 @@ type Result<T, E = Error> = std::result::Result<T, E>;
 /// )
 /// .unwrap();
 /// file.set_frame_buffer(&pixels, 1, width as usize).unwrap();
-/// file.write_tiles(
-///     0,
-///     file.num_x_tiles(0).unwrap() - 1,
-///     0,
-///     file.num_y_tiles(0).unwrap() - 1,
-///     0,
-///     0,
-/// )
-/// .unwrap();
+/// unsafe {
+///    file.write_tiles(
+///        0,
+///        file.num_x_tiles(0).unwrap() - 1,
+///        0,
+///        file.num_y_tiles(0).unwrap() - 1,
+///        0,
+///        0,
+///    )
+///    .unwrap();
+/// }
 /// ```
 ///
 #[repr(transparent)]
@@ -560,17 +562,20 @@ impl TiledRgbaOutputFile {
     /// The order of the calls to `write_tile()` determines
     /// the order of the tiles in the file.
     ///
-    pub fn write_tile(
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](TiledRgbaOutputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn write_tile(
         &mut self,
         dx: i32,
         dy: i32,
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_TiledRgbaOutputFile_writeTile(self.0, dx, dy, lx, ly)
-                .into_result()?;
-        }
+        sys::Imf_TiledRgbaOutputFile_writeTile(self.0, dx, dy, lx, ly)
+            .into_result()?;
 
         Ok(())
     }
@@ -637,7 +642,12 @@ impl TiledRgbaOutputFile {
     /// The order of the calls to `write_tile()` determines
     /// the order of the tiles in the file.
     ///
-    pub fn write_tiles(
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](TiledRgbaOutputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn write_tiles(
         &mut self,
         dx1: i32,
         dx2: i32,
@@ -646,12 +656,10 @@ impl TiledRgbaOutputFile {
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_TiledRgbaOutputFile_writeTiles(
-                self.0, dx1, dx2, dy1, dy2, lx, ly,
-            )
-            .into_result()?;
-        }
+        sys::Imf_TiledRgbaOutputFile_writeTiles(
+            self.0, dx1, dx2, dy1, dy2, lx, ly,
+        )
+        .into_result()?;
 
         Ok(())
     }
@@ -717,15 +725,17 @@ impl Drop for TiledRgbaOutputFile {
 /// let mut pixels = vec![Rgba::zero(); (width * height) as usize];
 /// file.set_frame_buffer(&mut pixels, 1, width as usize)
 ///     .unwrap();
-/// file.read_tiles(
-///     0,
-///     file.num_x_tiles(0).unwrap() - 1,
-///     0,
-///     file.num_y_tiles(0).unwrap() - 1,
-///     0,
-///     0,
-/// )
-/// .unwrap();
+/// unsafe {
+///    file.read_tiles(
+///        0,
+///        file.num_x_tiles(0).unwrap() - 1,
+///        0,
+///        file.num_y_tiles(0).unwrap() - 1,
+///        0,
+///        0,
+///    )
+///    .unwrap();
+/// }
 /// ```
 ///
 #[repr(transparent)]
@@ -1132,17 +1142,20 @@ impl TiledRgbaInputFile {
     /// * [`Error::InvalidArgument`] -if ly does not lie in the inverval [0, num_y_levels()-1]
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_tile(
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](TiledRgbaInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn read_tile(
         &mut self,
         dx: i32,
         dy: i32,
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_TiledRgbaInputFile_readTile(self.0, dx, dy, lx, ly)
-                .into_result()?;
-        }
+        sys::Imf_TiledRgbaInputFile_readTile(self.0, dx, dy, lx, ly)
+            .into_result()?;
         Ok(())
     }
 
@@ -1157,7 +1170,12 @@ impl TiledRgbaInputFile {
     /// * [`Error::InvalidArgument`] -if ly does not lie in the inverval [0, num_y_levels()-1]
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_tiles(
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](TiledRgbaInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn read_tiles(
         &mut self,
         dx1: i32,
         dx2: i32,
@@ -1166,12 +1184,10 @@ impl TiledRgbaInputFile {
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_TiledRgbaInputFile_readTiles(
-                self.0, dx1, dx2, dy1, dy2, lx, ly,
-            )
-            .into_result()?;
-        }
+        sys::Imf_TiledRgbaInputFile_readTiles(
+            self.0, dx1, dx2, dy1, dy2, lx, ly,
+        )
+        .into_result()?;
         Ok(())
     }
 }
@@ -1205,14 +1221,16 @@ fn test_write_tiled_rgba1() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
     file.set_frame_buffer(&pixels, 1, width as usize)?;
-    file.write_tiles(
-        0,
-        file.num_x_tiles(0)? - 1,
-        0,
-        file.num_y_tiles(0)? - 1,
-        0,
-        0,
-    )?;
+    unsafe {
+        file.write_tiles(
+            0,
+            file.num_x_tiles(0)? - 1,
+            0,
+            file.num_y_tiles(0)? - 1,
+            0,
+            0,
+        )?;
+    }
 
     Ok(())
 }
@@ -1238,14 +1256,16 @@ fn test_read_tiled_rgba1() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut pixels = vec![Rgba::zero(); (width * height) as usize];
     file.set_frame_buffer(&mut pixels, 1, width as usize)?;
-    file.read_tiles(
-        0,
-        file.num_x_tiles(0)? - 1,
-        0,
-        file.num_y_tiles(0)? - 1,
-        0,
-        0,
-    )?;
+    unsafe {
+        file.read_tiles(
+            0,
+            file.num_x_tiles(0)? - 1,
+            0,
+            file.num_y_tiles(0)? - 1,
+            0,
+            0,
+        )?;
+    }
 
     let mut ofile = RgbaOutputFile::with_dimensions(
         "read_tiled_rgba1.exr",
@@ -1261,7 +1281,9 @@ fn test_read_tiled_rgba1() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
     ofile.set_frame_buffer(&pixels, 1, width as usize)?;
-    ofile.write_pixels(height)?;
+    unsafe {
+        ofile.write_pixels(height)?;
+    }
 
     Ok(())
 }

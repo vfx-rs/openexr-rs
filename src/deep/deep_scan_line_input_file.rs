@@ -125,34 +125,41 @@ impl DeepScanLineInputFile {
     ///
     /// `read_pixel_sample_counts()` must be called before calling this method.
     ///
+    /// # Safety
+    /// You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be read.
+    ///
     /// # Errors
     /// * [`Error::InvalidArgument`] - if no frame buffer has been set, if `s1`
     /// or `s2` are outside the data window, or if the sample counts have not been
     /// read yet
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_pixels(&mut self, s1: i32, s2: i32) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepScanLineInputFile_readPixels(self.0, s1, s2)
-                .into_result()?;
-        }
+    pub unsafe fn read_pixels(&mut self, s1: i32, s2: i32) -> Result<()> {
+        sys::Imf_DeepScanLineInputFile_readPixels(self.0, s1, s2)
+            .into_result()?;
         Ok(())
     }
 
     /// Read the sample counts for each pixel and place them in the sample
     /// count slice in the frame buffer.
     ///
+    /// # Safety
+    /// You must ensure that the [`DeepFrameBuffer`] attached to this file
+    /// contains an appropriately sized sample count channel.
+    ///
     /// # Errors
     /// * [`Error::InvalidArgument`] - if `s1` or `s2` are outside the data
     /// window.
     ///
-    pub fn read_pixel_sample_counts(&mut self, s1: i32, s2: i32) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepScanLineInputFile_readPixelSampleCounts(
-                self.0, s1, s2,
-            )
+    pub unsafe fn read_pixel_sample_counts(
+        &mut self,
+        s1: i32,
+        s2: i32,
+    ) -> Result<()> {
+        sys::Imf_DeepScanLineInputFile_readPixelSampleCounts(self.0, s1, s2)
             .into_result()?;
-        }
 
         Ok(())
     }
@@ -332,8 +339,10 @@ fn read_deep1() {
 
     // set the frame buffer and read the sample counts channel
     file.set_frame_buffer(&frame_buffer).unwrap();
-    file.read_pixel_sample_counts(data_window[1], data_window[3])
-        .unwrap();
+    unsafe {
+        file.read_pixel_sample_counts(data_window[1], data_window[3])
+            .unwrap();
+    }
 
     let sample_count_frame = frame_buffer.sample_count_frame.take().unwrap();
 
@@ -366,5 +375,7 @@ fn read_deep1() {
         .unwrap();
 
     // read the data
-    file.read_pixels(data_window[1], data_window[3]).unwrap();
+    unsafe {
+        file.read_pixels(data_window[1], data_window[3]).unwrap();
+    }
 }

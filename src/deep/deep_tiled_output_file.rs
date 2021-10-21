@@ -429,17 +429,23 @@ impl DeepTiledOutputFile {
     /// The order of the calls to `write_tile()` determines
     /// the order of the tiles in the file.
     ///
-    pub fn write_tile(
+    /// # Safety
+    /// This method is wildly unsafe as on the C++ side it's reading from
+    /// pointers offset from the base pointers supplied by the
+    /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn write_tile(
         &mut self,
         dx: i32,
         dy: i32,
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepTiledOutputFile_writeTile(self.0, dx, dy, lx, ly)
-                .into_result()?;
-        }
+        sys::Imf_DeepTiledOutputFile_writeTile(self.0, dx, dy, lx, ly)
+            .into_result()?;
 
         Ok(())
     }
@@ -506,7 +512,15 @@ impl DeepTiledOutputFile {
     /// The order of the calls to `write_tile()` determines
     /// the order of the tiles in the file.
     ///
-    pub fn write_tiles(
+    /// # Safety
+    /// This method is wildly unsafe as on the C++ side it's reading from
+    /// pointers offset from the base pointers supplied by the
+    /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn write_tiles(
         &mut self,
         dx1: i32,
         dx2: i32,
@@ -515,12 +529,10 @@ impl DeepTiledOutputFile {
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepTiledOutputFile_writeTiles(
-                self.0, dx1, dx2, dy1, dy2, lx, ly,
-            )
-            .into_result()?;
-        }
+        sys::Imf_DeepTiledOutputFile_writeTiles(
+            self.0, dx1, dx2, dy1, dy2, lx, ly,
+        )
+        .into_result()?;
 
         Ok(())
     }
@@ -683,14 +695,16 @@ fn test_write_deep_tiled1() -> Result<()> {
     let mut file =
         DeepTiledOutputFile::new("write_deep_tiled1.exr", &header, 4)?;
     file.set_frame_buffer(&frame_buffer)?;
-    file.write_tiles(
-        0,
-        file.num_x_tiles(0)? - 1,
-        0,
-        file.num_y_tiles(0)? - 1,
-        0,
-        0,
-    )?;
+    unsafe {
+        file.write_tiles(
+            0,
+            file.num_x_tiles(0)? - 1,
+            0,
+            file.num_y_tiles(0)? - 1,
+            0,
+            0,
+        )?;
+    }
 
     drop(file);
 

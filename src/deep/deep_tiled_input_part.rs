@@ -385,6 +385,14 @@ impl<'a> DeepTiledInputPart<'a> {
     /// Reads the tile with tile coordinates `(dx, dy)`, and level number `(lx, ly)`,
     /// and stores it in the current frame buffer.
     ///
+    /// # Safety
+    /// This method is wildly unsafe as on the C++ side it's reading from
+    /// pointers offset from the base pointers supplied by the
+    /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be read.
+    ///
     ///   # Errors
     /// * [`Error::InvalidArgument`] - if dx does not lie in the interval [0, num_x_tiles(lx)-1]
     /// * [`Error::InvalidArgument`] - if dy does not lie in the interval [0, num_y_tiles(ly)-1]
@@ -394,28 +402,28 @@ impl<'a> DeepTiledInputPart<'a> {
     /// * [`Error::Io`] - if there is an error reading data from the file
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_tile(
+    pub unsafe fn read_tile(
         &mut self,
         dx: i32,
         dy: i32,
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepTiledInputPart_readTile(
-                &mut self.inner,
-                dx,
-                dy,
-                lx,
-                ly,
-            )
+        sys::Imf_DeepTiledInputPart_readTile(&mut self.inner, dx, dy, lx, ly)
             .into_result()?;
-        }
         Ok(())
     }
 
     /// Reads the sample counts in tile range with coordinates `(dx1, dy1)`, to `(dx2, dy2)` and level number `(lx, ly)`,
     /// and stores it in the current frame buffer.
+    ///
+    /// # Safety
+    /// This method is wildly unsafe as on the C++ side it's reading from
+    /// pointers offset from the base pointers supplied by the
+    /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be read.
     ///
     ///   # Errors
     /// * [`Error::InvalidArgument`] - if dx does not lie in the interval [0, num_x_tiles(lx)-1]
@@ -426,7 +434,7 @@ impl<'a> DeepTiledInputPart<'a> {
     /// * [`Error::Io`] - if there is an error reading data from the file
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_tiles(
+    pub unsafe fn read_tiles(
         &mut self,
         dx1: i32,
         dx2: i32,
@@ -435,24 +443,30 @@ impl<'a> DeepTiledInputPart<'a> {
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepTiledInputPart_readTiles(
-                &mut self.inner,
-                dx1,
-                dx2,
-                dy1,
-                dy2,
-                lx,
-                ly,
-            )
-            .into_result()?;
-        }
+        sys::Imf_DeepTiledInputPart_readTiles(
+            &mut self.inner,
+            dx1,
+            dx2,
+            dy1,
+            dy2,
+            lx,
+            ly,
+        )
+        .into_result()?;
         Ok(())
     }
 
     /// Reads the tile with tile coordinates `(dx, dy)`, and level number `(lx, ly)`,
     /// and stores it in the current frame buffer.
     ///
+    /// # Safety
+    /// This method is wildly unsafe as on the C++ side it's reading from
+    /// pointers offset from the base pointers supplied by the
+    /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be read.
+    ///
     ///   # Errors
     /// * [`Error::InvalidArgument`] - if dx does not lie in the interval [0, num_x_tiles(lx)-1]
     /// * [`Error::InvalidArgument`] - if dy does not lie in the interval [0, num_y_tiles(ly)-1]
@@ -462,28 +476,34 @@ impl<'a> DeepTiledInputPart<'a> {
     /// * [`Error::Input`] - if the file has an unexpected structure
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_pixel_sample_count(
+    pub unsafe fn read_pixel_sample_count(
         &mut self,
         dx: i32,
         dy: i32,
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepTiledInputPart_readPixelSampleCount(
-                &mut self.inner,
-                dx,
-                dy,
-                lx,
-                ly,
-            )
-            .into_result()?;
-        }
+        sys::Imf_DeepTiledInputPart_readPixelSampleCount(
+            &mut self.inner,
+            dx,
+            dy,
+            lx,
+            ly,
+        )
+        .into_result()?;
         Ok(())
     }
 
     /// Reads the sample counts in tile range with coordinates `(dx1, dy1)`, to `(dx2, dy2)` and level number `(lx, ly)`,
     /// and stores it in the current frame buffer.
+    ///
+    /// # Safety
+    /// This method is wildly unsafe as on the C++ side it's reading from
+    /// pointers offset from the base pointers supplied by the
+    /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be read.
     ///
     ///   # Errors
     /// * [`Error::InvalidArgument`] - if dx does not lie in the interval [0, num_x_tiles(lx)-1]
@@ -494,7 +514,7 @@ impl<'a> DeepTiledInputPart<'a> {
     /// * [`Error::Input`] - if the file has an unexpected structure
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_pixel_sample_counts(
+    pub unsafe fn read_pixel_sample_counts(
         &mut self,
         dx1: i32,
         dx2: i32,
@@ -503,18 +523,16 @@ impl<'a> DeepTiledInputPart<'a> {
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepTiledInputPart_readPixelSampleCounts(
-                &mut self.inner,
-                dx1,
-                dx2,
-                dy1,
-                dy2,
-                lx,
-                ly,
-            )
-            .into_result()?;
-        }
+        sys::Imf_DeepTiledInputPart_readPixelSampleCounts(
+            &mut self.inner,
+            dx1,
+            dx2,
+            dy1,
+            dy2,
+            lx,
+            ly,
+        )
+        .into_result()?;
         Ok(())
     }
 }

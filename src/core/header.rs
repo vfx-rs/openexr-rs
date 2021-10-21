@@ -204,7 +204,7 @@ impl Header {
         unsafe {
             let ptr = System
                 .alloc(Layout::array::<sys::Imf_Header_t>(num).unwrap())
-                                as *mut sys::Imf_Header_t;
+                as *mut sys::Imf_Header_t;
 
             dbg!(std::mem::size_of::<sys::Imf_Header_t>());
 
@@ -1269,7 +1269,9 @@ fn header_rtrip1() -> Result<()> {
     )?;
 
     file.set_frame_buffer(&pixels, 1, width as usize)?;
-    file.write_pixels(height)?;
+    unsafe {
+        file.write_pixels(height)?;
+    }
 
     std::mem::drop(file);
 

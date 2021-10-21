@@ -438,17 +438,20 @@ impl<'a> TiledOutputPart<'a> {
     /// The order of the calls to `write_tile()` determines
     /// the order of the tiles in the file.
     ///
-    pub fn write_tile(
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](TiledOutputPart::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn write_tile(
         &mut self,
         dx: i32,
         dy: i32,
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_TiledOutputPart_writeTile(&mut self.inner, dx, dy, lx, ly)
-                .into_result()?
-        }
+        sys::Imf_TiledOutputPart_writeTile(&mut self.inner, dx, dy, lx, ly)
+            .into_result()?;
 
         Ok(())
     }
@@ -515,7 +518,12 @@ impl<'a> TiledOutputPart<'a> {
     /// The order of the calls to `write_tile()` determines
     /// the order of the tiles in the file.
     ///
-    pub fn write_tiles(
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](TiledOutputPart::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn write_tiles(
         &mut self,
         dx1: i32,
         dx2: i32,
@@ -524,18 +532,16 @@ impl<'a> TiledOutputPart<'a> {
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_TiledOutputPart_writeTiles(
-                &mut self.inner,
-                dx1,
-                dx2,
-                dy1,
-                dy2,
-                lx,
-                ly,
-            )
-            .into_result()?;
-        }
+        sys::Imf_TiledOutputPart_writeTiles(
+            &mut self.inner,
+            dx1,
+            dx2,
+            dy1,
+            dy2,
+            lx,
+            ly,
+        )
+        .into_result()?;
 
         Ok(())
     }

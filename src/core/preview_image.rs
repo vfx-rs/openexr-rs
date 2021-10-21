@@ -494,7 +494,9 @@ mod tests {
         )?;
 
         output_file.set_frame_buffer(&pixels, 1, width as usize)?;
-        output_file.write_pixels(height)?;
+        unsafe {
+            output_file.write_pixels(height)?;
+        }
 
         std::mem::drop(output_file);
 

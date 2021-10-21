@@ -132,6 +132,28 @@ fn read_rgba1(path: &str) -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+# Safety
+Some parts of the OpenEXR API are not easily representable in safe Rust.
+Notably, the interaction between [`Slice`](crate::core::frame_buffer::Slice), [`FrameBuffer`](crate::core::frame_buffer::FrameBuffer) and the various
+File types essentially creates a chain of (mutable) references between the
+memory backing the pixel data and the file.
+
+Representing this with lifetimes such that the Rust compiler could track it
+would make working with these types extremely unwieldy, so instead the
+methods which actually use the pointers in slices and framebuffers are
+marked unsafe. It is the caller's responsibility to make sure that the
+pointers inserted into the framebuffer are still valid when the image is
+read or written:
+
+```rust
+// set_frame_buffer internally stores a slice in a frame buffer on the file
+// struct. pixels must live until the write_pixels call below has completed.
+file.set_frame_buffer(&pixels, 1, width as usize)?;
+unsafe {
+    file.write_pixels(height)?;
+}
+```
+
 # Features
 * High dynamic range and color precision.
 * Support for 16-bit floating-point, 32-bit floating-point, and 32-bit integer pixels.

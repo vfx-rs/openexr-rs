@@ -1,6 +1,6 @@
 [package]
 name = "openexr"
-version = "0.10.1"
+version = "0.11.0"
 authors = ["Anders Langlands <anderslanglands@gmail.com>",
            "Luke Titley <from+openexr_rs@luketitley.com>",
            "Scott Wilson <scott@propersquid.com>",

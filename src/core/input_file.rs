@@ -143,16 +143,19 @@ impl InputFile {
     ///
     /// `read_pixel_sample_counts()` must be called before calling this method.
     ///
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](InputFile::set_frame_buffer) has valid slices
+    /// for the channels to be read.
+    ///
     /// # Errors
     /// * [`Error::InvalidArgument`] - if no frame buffer has been set, if `s1`
     /// or `s2` are outside the data window, or if the sample counts have not been
     /// read yet
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_pixels(&mut self, s1: i32, s2: i32) -> Result<()> {
-        unsafe {
-            sys::Imf_InputFile_readPixels(self.0, s1, s2).into_result()?;
-        }
+    pub unsafe fn read_pixels(&mut self, s1: i32, s2: i32) -> Result<()> {
+        sys::Imf_InputFile_readPixels(self.0, s1, s2).into_result()?;
         Ok(())
     }
 

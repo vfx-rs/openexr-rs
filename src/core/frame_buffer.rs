@@ -40,6 +40,11 @@ impl FrameBuffer {
 
     /// Insert a [`Slice`] into the `FrameBuffer`.
     ///
+    /// # Safety
+    /// On the C++ side `slice` is converted to a raw pointer, so it is the
+    /// caller's responsibility to ensure that `slice` is correctly sized and
+    /// still alive for any future reads or writes.
+    ///
     /// # Errors
     /// * [`Error::InvalidArgument`] - if name is the empty string
     ///

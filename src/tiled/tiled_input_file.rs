@@ -469,6 +469,11 @@ impl TiledInputFile {
     /// Reads the tile with tile coordinates `(dx, dy)`, and level number `(lx, ly)`,
     /// and stores it in the current frame buffer.
     ///
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](TiledInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be read.
+    ///
     ///   # Errors
     /// * [`Error::InvalidArgument`] - if dx does not lie in the interval [0, num_x_tiles(lx)-1]
     /// * [`Error::InvalidArgument`] - if dy does not lie in the interval [0, num_y_tiles(ly)-1]
@@ -478,22 +483,25 @@ impl TiledInputFile {
     /// * [`Error::Io`] - if there is an error reading data from the file
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_tile(
+    pub unsafe fn read_tile(
         &mut self,
         dx: i32,
         dy: i32,
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_TiledInputFile_readTile(self.0, dx, dy, lx, ly)
-                .into_result()?;
-        }
+        sys::Imf_TiledInputFile_readTile(self.0, dx, dy, lx, ly)
+            .into_result()?;
         Ok(())
     }
 
     /// Reads the sample counts in tile range with coordinates `(dx1, dy1)`, to `(dx2, dy2)` and level number `(lx, ly)`,
     /// and stores it in the current frame buffer.
+    ///
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](TiledInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be read.
     ///
     ///   # Errors
     /// * [`Error::InvalidArgument`] - if dx does not lie in the interval [0, num_x_tiles(lx)-1]
@@ -504,7 +512,7 @@ impl TiledInputFile {
     /// * [`Error::Io`] - if there is an error reading data from the file
     /// * [`Error::Base`] - if any other error occurs
     ///
-    pub fn read_tiles(
+    pub unsafe fn read_tiles(
         &mut self,
         dx1: i32,
         dx2: i32,
@@ -513,12 +521,8 @@ impl TiledInputFile {
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_TiledInputFile_readTiles(
-                self.0, dx1, dx2, dy1, dy2, lx, ly,
-            )
+        sys::Imf_TiledInputFile_readTiles(self.0, dx1, dx2, dy1, dy2, lx, ly)
             .into_result()?;
-        }
         Ok(())
     }
 }
@@ -786,16 +790,20 @@ mod tests {
         let mut tiled_input_file = get_tiled_input_file();
         let frame_buffer = FrameBuffer::new();
         tiled_input_file.set_frame_buffer(&frame_buffer).unwrap();
-        tiled_input_file.read_tile(0, 0, 0, 0).unwrap();
+        unsafe {
+            tiled_input_file.read_tile(0, 0, 0, 0).unwrap();
+        }
     }
 
     #[test]
     #[should_panic]
     fn test_tiledinputfile_read_tile_failure_invalid_level_and_frame_buffer() {
         let mut tiled_input_file = get_tiled_input_file();
-        tiled_input_file
-            .read_tile(i32::MIN, i32::MIN, i32::MIN, i32::MIN)
-            .unwrap();
+        unsafe {
+            tiled_input_file
+                .read_tile(i32::MIN, i32::MIN, i32::MIN, i32::MIN)
+                .unwrap();
+        }
     }
 
     #[test]
@@ -803,22 +811,26 @@ mod tests {
         let mut tiled_input_file = get_tiled_input_file();
         let frame_buffer = FrameBuffer::new();
         tiled_input_file.set_frame_buffer(&frame_buffer).unwrap();
-        tiled_input_file.read_tiles(0, 0, 0, 0, 0, 0).unwrap();
+        unsafe {
+            tiled_input_file.read_tiles(0, 0, 0, 0, 0, 0).unwrap();
+        }
     }
 
     #[test]
     #[should_panic]
     fn test_tiledinputfile_read_tiles_failure_invalid_level_and_frame_buffer() {
         let mut tiled_input_file = get_tiled_input_file();
-        tiled_input_file
-            .read_tiles(
-                i32::MIN,
-                i32::MIN,
-                i32::MIN,
-                i32::MIN,
-                i32::MIN,
-                i32::MIN,
-            )
-            .unwrap();
+        unsafe {
+            tiled_input_file
+                .read_tiles(
+                    i32::MIN,
+                    i32::MIN,
+                    i32::MIN,
+                    i32::MIN,
+                    i32::MIN,
+                    i32::MIN,
+                )
+                .unwrap();
+        }
     }
 }

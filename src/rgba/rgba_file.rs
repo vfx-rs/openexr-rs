@@ -33,7 +33,9 @@ type Result<T, E = Error> = std::result::Result<T, E>;
 /// .unwrap();
 ///
 /// file.set_frame_buffer(&pixels, 1, width as usize).unwrap();
-/// file.write_pixels(height).unwrap();
+/// unsafe {
+///     file.write_pixels(height).unwrap();
+/// }
 /// ```
 ///
 #[repr(transparent)]
@@ -154,6 +156,11 @@ impl RgbaOutputFile {
     ///
     /// Pixel (x, y) is at offset x * x_stride + y * y_stride
     ///
+    /// ## Safety
+    /// Calling this method is safe, but it is the caller's responsibility to
+    /// ensure that `data` remains valid for any subsequent calls to
+    /// [`write_pixels()`](RgbaOutputFile::write_pixels).
+    ///
     /// ## Errors
     /// * [`Error::Base`] - If an error occurs
     ///
@@ -178,7 +185,7 @@ impl RgbaOutputFile {
 
     /// Write the pixel data to the output file
     ///
-    /// Retrieves the next n scan lines worth of data from
+    /// Retrieves the next `num_scan_lines` worth of data from
     /// the current frame buffer, starting with the scan line indicated by
     /// [`RgbaOutputFile::current_scan_line`], and stores the data in the output file, and
     /// progressing in the direction indicated by [`Header::line_order`].
@@ -187,14 +194,17 @@ impl RgbaOutputFile {
     /// be written, where `m` is equal to
     /// data_window().max.y - data_window().min.y + 1.
     ///
+    /// ## Safety
+    /// The caller must ensure that the slice provided to
+    /// [`set_frame_buffer()`](RgbaOutputFile::set_frame_buffer) remains valid
+    /// when calling this method.
+    ///
     /// ## Errors
     /// * [`Error::Base`] - If an error occurs
     ///
-    pub fn write_pixels(&mut self, num_scan_lines: i32) -> Result<()> {
-        unsafe {
-            sys::Imf_RgbaOutputFile_writePixels(self.0, num_scan_lines)
-                .into_result()?;
-        }
+    pub unsafe fn write_pixels(&mut self, num_scan_lines: i32) -> Result<()> {
+        sys::Imf_RgbaOutputFile_writePixels(self.0, num_scan_lines)
+            .into_result()?;
         Ok(())
     }
 
@@ -206,7 +216,8 @@ impl RgbaOutputFile {
     ///
     /// If `line_order() == INCREASING_Y`:
     ///
-    /// The current scan line before the first call to write_pixels()
+    /// The current scan line before the first call to
+    /// [`write_pixels()`](RgbaOutputFile::write_pixels)
     /// is header().data_window().min.y.  After writing each scan line,
     /// the current scan line is incremented by 1.
     ///
@@ -378,6 +389,11 @@ impl RgbaInputFile {
     ///
     /// Pixel (x, y) is at offset x * x_stride + y * y_stride
     ///
+    /// ## Safety
+    /// Calling this method is safe, but it is the caller's responsibility to
+    /// ensure that `pixels` remains valid when calling
+    /// [`read_pixels()`](RgbaInputFile::read_pixels).
+    ///
     /// ## Errors
     /// * [`Error::InvalidArgument`] - If the frame buffer's data type can not be
     /// determined
@@ -409,6 +425,7 @@ impl RgbaInputFile {
     ///
     /// Each call to [`RgbaInputFile::set_layer_name`] must be followed by a
     /// call to [`RgbaInputFile::set_frame_buffer`] before reading.
+    ///
     pub fn set_layer_name(&mut self, name: &str) {
         unsafe {
             let s = CppString::new(name);
@@ -430,18 +447,21 @@ impl RgbaInputFile {
     /// For maximum efficiency, the scan lines should be read in the
     /// order in which they were written to the file.
     ///
+    /// ## Safety
+    /// The caller must ensure that the storage passed to
+    /// [`set_frame_buffer()`](RgbaInputFile::set_frame_buffer) remains valid
+    /// when calling this method.
+    ///
     /// ## Errors
     /// * [`Error::Base`] - If an error occurs
     ///
-    pub fn read_pixels(
+    pub unsafe fn read_pixels(
         &mut self,
         scanline1: i32,
         scanline2: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_RgbaInputFile_readPixels(self.0, scanline1, scanline2)
-                .into_result()?;
-        }
+        sys::Imf_RgbaInputFile_readPixels(self.0, scanline1, scanline2)
+            .into_result()?;
 
         Ok(())
     }

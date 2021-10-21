@@ -420,24 +420,23 @@ impl<'a> DeepTiledOutputPart<'a> {
     /// The order of the calls to `write_tile()` determines
     /// the order of the tiles in the file.
     ///
-    pub fn write_tile(
+    /// # Safety
+    /// This method is wildly unsafe as on the C++ side it's reading from
+    /// pointers offset from the base pointers supplied by the
+    /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn write_tile(
         &mut self,
         dx: i32,
         dy: i32,
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepTiledOutputPart_writeTile(
-                &mut self.inner,
-                dx,
-                dy,
-                lx,
-                ly,
-            )
-            .into_result()?
-        }
-
+        sys::Imf_DeepTiledOutputPart_writeTile(&mut self.inner, dx, dy, lx, ly)
+            .into_result()?;
         Ok(())
     }
 
@@ -503,7 +502,15 @@ impl<'a> DeepTiledOutputPart<'a> {
     /// The order of the calls to `write_tile()` determines
     /// the order of the tiles in the file.
     ///
-    pub fn write_tiles(
+    /// # Safety
+    /// This method is wildly unsafe as on the C++ side it's reading from
+    /// pointers offset from the base pointers supplied by the
+    /// [`DeepSlice`](crate::deep::deep_frame_buffer::DeepSlice) in
+    /// the [`DeepFrameBuffer`]. You must ensure the the [`DeepFrameBuffer`] attached to this file by
+    /// [`set_frame_buffer()`](DeepScanLineInputFile::set_frame_buffer) has valid slices
+    /// for the channels to be written.
+    ///
+    pub unsafe fn write_tiles(
         &mut self,
         dx1: i32,
         dx2: i32,
@@ -512,18 +519,16 @@ impl<'a> DeepTiledOutputPart<'a> {
         lx: i32,
         ly: i32,
     ) -> Result<()> {
-        unsafe {
-            sys::Imf_DeepTiledOutputPart_writeTiles(
-                &mut self.inner,
-                dx1,
-                dx2,
-                dy1,
-                dy2,
-                lx,
-                ly,
-            )
-            .into_result()?;
-        }
+        sys::Imf_DeepTiledOutputPart_writeTiles(
+            &mut self.inner,
+            dx1,
+            dx2,
+            dy1,
+            dy2,
+            lx,
+            ly,
+        )
+        .into_result()?;
 
         Ok(())
     }

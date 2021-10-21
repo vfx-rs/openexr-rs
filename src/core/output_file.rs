@@ -93,6 +93,11 @@ impl OutputFile {
     /// called.  The current frame buffer can be changed
     /// after each call to [`OutputFile::write_pixels`].
     ///
+    /// # Safety
+    /// You must ensure the the [`FrameBuffer`] attached to this file by
+    /// has valid slices for the channels to be written when
+    /// [`write_pixels()`](OutputFile::write_pixels) is called.
+    ///
     /// ## Errors
     /// * [`Error::InvalidArgument`] - If the pixel type of the
     /// [`Channel`](crate::core::channel_list::Channel)s in the [`Header`]
