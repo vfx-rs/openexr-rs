@@ -1,6 +1,6 @@
 [package]
 name = "openexr"
-version = "0.11.0"
+version = "0.12.0"
 authors = ["Anders Langlands <anderslanglands@gmail.com>",
            "Luke Titley <from+openexr_rs@luketitley.com>",
            "Scott Wilson <scott@propersquid.com>",
@@ -27,11 +27,11 @@ rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 
 [dependencies]
 openexr-sys = "^0.10.1"
-imath-traits = "^0.4"
-cgmath = {version = "^0.18", optional = true}
-glam = {version = "^0.17", optional = true}
-nalgebra = {version = "^0.27", optional = true}
-nalgebra-glm = {version = "^0.12", optional = true}
+imath-traits = {path = "../imath-traits", version = "0.7"} 
+cgmath = {version = "*", optional = true}
+glam = {version = "*", optional = true}
+nalgebra = {version = "*", optional = true}
+nalgebra-glm = {version = "*", optional = true}
 half = "^1.7"
 thiserror = "^1.0"
 paste = "^1.0"
