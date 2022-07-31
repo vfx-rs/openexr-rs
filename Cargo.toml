@@ -1,6 +1,6 @@
 [package]
 name = "openexr"
-version = "3.0.5"
+version = "3.1.5"
 authors = ["Anders Langlands <anderslanglands@gmail.com>",
            "Luke Titley <from+openexr_rs@luketitley.com>",
            "Scott Wilson <scott@propersquid.com>",
@@ -8,7 +8,7 @@ authors = ["Anders Langlands <anderslanglands@gmail.com>",
 edition = "2018"
 
 license="BSD-3-Clause"
-description = "High-level bindings to OpenEXR 3.0.5"
+description = "High-level bindings to OpenEXR 3.1.5"
 documentation = "https://docs.rs/openexr"
 repository = "https://github.com/vfx-rs/openexr-rs"
 readme = "README.md"
@@ -26,7 +26,7 @@ rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-openexr-sys = {path = "../openexr-bind/build/openexr-sys", version = "3.0"}
+openexr-sys = {path = "../openexr-bind/build/openexr-sys", version = "3.1"}
 imath-traits = {path = "../imath-traits", version = "0.7"} 
 cgmath = {version = "*", optional = true}
 glam = {version = "*", optional = true}

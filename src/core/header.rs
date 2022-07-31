@@ -693,6 +693,71 @@ impl Header {
             *ptr = cmp.into();
         }
     }
+
+    /// Set the compression level for ZIP compression.
+    ///
+    /// Note that this is not stored in the header, but is an ephemeral setting
+    /// affecting this header object only. 
+    ///
+    pub fn set_zip_compression_level(&mut self, level: i32) {
+        unsafe {
+            let mut level_ptr = std::ptr::null_mut();
+            sys::Imf_Header_zipCompressionLevel(self.0.as_mut(), &mut level_ptr);
+            *level_ptr = level;
+        }
+    }
+
+
+    /// Get the compression level for ZIP compression.
+    ///
+    /// Note that this is not stored in the header, but is an ephemeral setting
+    /// affecting this header object only. 
+    ///
+    pub fn zip_compression_level(&mut self) -> i32 {
+        let mut level = 0i32;
+        unsafe {
+            sys::Imf_Header_zipCompressionLevel_const(self.0.as_mut(), &mut level);
+        }
+        level
+    }
+
+    /// Set the compression level for DWA compression.
+    ///
+    /// Note that this is not stored in the header, but is an ephemeral setting
+    /// affecting this header object only. 
+    ///
+    pub fn set_dwa_compression_level(&mut self, level: f32) {
+        unsafe {
+            let mut level_ptr = std::ptr::null_mut();
+            sys::Imf_Header_dwaCompressionLevel(self.0.as_mut(), &mut level_ptr);
+            *level_ptr = level;
+        }
+    }
+
+
+    /// Get the compression level for DWA compression.
+    ///
+    /// Note that this is not stored in the header, but is an ephemeral setting
+    /// affecting this header object only. 
+    ///
+    pub fn dwa_compression_level(&mut self) -> f32 {
+        let mut level = 0f32;
+        unsafe {
+            sys::Imf_Header_dwaCompressionLevel_const(self.0.as_mut(), &mut level);
+        }
+        level
+    }
+
+    /// Reset compression levels to their default values
+    ///
+    /// Note that this is not stored in the header, but is an ephemeral setting
+    /// affecting this header object only. 
+    ///
+    pub fn reset_default_compression_levels(&mut self) {
+        unsafe {
+            sys::Imf_Header_resetDefaultCompressionLevels(self.0.as_mut());
+        }
+    }
 }
 
 impl Header {

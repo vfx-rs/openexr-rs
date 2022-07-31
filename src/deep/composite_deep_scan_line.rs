@@ -186,6 +186,38 @@ impl<'a, 'p> CompositeDeepScanLine<'a, 'p> {
     }
 
     // TODO: implement set_compositing()
+
+    /// Set the maximum number of samples that will be composited.
+    ///
+    /// If a single scanline has more samples, readPixels will throw
+    /// an exception. This mechanism prevents the library allocating
+    /// excessive memory to composite deep scanline images.
+    /// A value of 0 will cause deep compositing to be disabled entirely
+    /// A negative value disables the limit, allowing images with
+    /// arbitrarily large sample counts to be composited
+    ///
+    pub fn set_maximum_sample_count(sample_count: i64) {
+        unsafe {
+            sys::Imf_CompositeDeepScanLine_setMaximumSampleCount(sample_count);
+        }
+    }
+
+    /// Get the maximum number of samples that will be composited.
+    ///
+    /// If a single scanline has more samples, readPixels will throw
+    /// an exception. This mechanism prevents the library allocating
+    /// excessive memory to composite deep scanline images.
+    /// A value of 0 will cause deep compositing to be disabled entirely
+    /// A negative value disables the limit, allowing images with
+    /// arbitrarily large sample counts to be composited
+    ///
+    pub fn maximum_sample_count(&mut self) -> i64 {
+        let mut result = 0i64;
+        unsafe {
+            sys::Imf_CompositeDeepScanLine_getMaximumSampleCount(&mut result);
+        }
+        result
+    }
 }
 
 impl<'a, 'p> Default for CompositeDeepScanLine<'a, 'p> {
